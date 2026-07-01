@@ -1,0 +1,74 @@
+﻿@page "/deletegame/{id:int}"
+@attribute [StreamRendering]
+@using MP.Components.Data
+@using MP.Components.Models
+@using Microsoft.EntityFrameworkCore
+@inject IDbContextFactory<MP.Components.Data.MPcontext> DbFactory
+@inject NavigationManager NavigationManager
+@inject MP.Components.Data.MPcontext gamecontext
+@rendermode InteractiveServer
+<PageTitle>Delete Game</PageTitle>
+<container style="text-align:center; color:slategray; align-content: center;">
+    <h1 style="color:red">Warning: This page should only be accessed if you are an approved admin</h1>
+    
+    <div>
+        <hr / style="color:white;">
+        @if (game is null)
+        {
+            <h1 style="color:red; text-align:center;"><em>No game can be found.</em></h1>
+        }
+        else
+        {
+            <h1 style="margin-top:40px;">Delete</h1>
+            @* Get details on the current game *@
+            <h2>Are you sure you want to delete this?</h2>
+            <div style="margin-left:25px;">
+                <dl class="row">
+                    <dt class="col-sm-2" style="font-size:30px;">Game ID</dt>
+                    <dd class="col-sm-10" style="font-size:30px;">@game.GameID</dd>
+                </dl>
+                <dl class="row">
+                    <dt class="col-sm-2" style="font-size:30px;">Game Name</dt>
+                    <dd class="col-sm-10" style="font-size:30px;">@game.GameName</dd>
+                </dl>
+                <dl class="row">
+                    <dt class="col-sm-2" style="font-size:30px;">Game Link</dt>
+                    <dd class="col-sm-10" style="font-size:30px;">@game.GameLink</dd>
+                </dl>
+                <dl class="row">
+                    <dt class="col-sm-2" style="font-size:30px;">Game Thumbnail</dt>
+                    <div style="width: 60%;  display: flex;  align-items: center;color: none; margin-left:300px;">
+                        <img src="@game.Thumbnail.FirstOrDefault()" style="width: 60%; height: auto; align-content: center; border: 5px solid white; border-radius: 5px;" alt="Uploaded Image" />
+                    </div>
+                </dl>
+                <EditForm method="post" Model="game" OnValidSubmit="DeleteGame" FormName="delete" Enhance>
+                    <button type="submit" class="btn btn-danger" disabled="@(game is null)">Delete</button> |
+                    <a href="/games">Back to Games</a>
+                </EditForm>
+            </div>
+        }
+    </div>
+</container>
+@code {
+    [Parameter]
+    public int id { get; set; }
+    Games? game;
+
+    protected override async Task OnInitializedAsync()
+    {
+        using var context = DbFactory.CreateDbContext();
+
+
+    }
+    protected override void OnInitialized() //get lesson id
+    {
+        game = gamecontext.Games.FirstOrDefault(x => x.GameID == id);
+    }
+    private async Task DeleteGame() //remove lesson from database
+    {
+        using var context = DbFactory.CreateDbContext();
+        context.Games.Remove(game!);
+        await context.SaveChangesAsync();
+        NavigationManager.NavigateTo("/games");
+    }
+}

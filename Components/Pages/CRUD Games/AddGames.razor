@@ -1,0 +1,204 @@
+﻿@page "/addgame"
+@using Microsoft.EntityFrameworkCore
+@using MP.Components.Data
+@using MP.Components.Models
+@using SixLabors.ImageSharp;
+@using SixLabors.ImageSharp.Processing;
+@using SixLabors.ImageSharp.PixelFormats;
+@inject IDbContextFactory<MP.Components.Data.MPcontext> DbFactory
+@inject NavigationManager NavigationManager
+@rendermode InteractiveServer
+@inject IJSRuntime JS
+<PageTitle>Add Game</PageTitle>
+<div style="max-width: 1100px; margin: 40px auto;">
+    <div style="text-align:center; color:white;">
+        <h1 style="margin:0;">Add Lesson</h1>
+        <p style="margin: 12px 0 28px 0; color:#cfcfcf;">
+            Add a new game. Upload an image on the right.
+        </p>
+    </div>
+
+    <EditForm method="post" Model="Games" OnValidSubmit="AddGame" FormName="create" Enhance>
+        <DataAnnotationsValidator />
+        <ValidationSummary class="text-danger" role="alert" />
+
+        <div style="
+            display:grid;
+            grid-template-columns: 1.2fr 0.8fr;
+            gap: 24px;
+            align-items:start;
+            ">
+
+            <!-- LEFT: Form Card -->
+            <div style="
+                background:#111;
+                border-radius: 18px;
+                padding: 22px;
+                box-shadow: 0 8px 30px rgba(0,0,0,0.35);
+                ">
+                <h4 style="color:white; margin:0 0 12px 0;">Game Details</h4>
+
+                <div class="mb-3">
+                    <label for="gamename" class="form-label" style="color:white;">Game Name</label>
+                    <InputText id="gamename" @bind-Value="Games.GameName" class="form-control" />
+                    <ValidationMessage For="() => Games.GameName" class="text-danger" />
+                </div>
+
+                <div class="mb-3">
+                    <label for="gamelink" class="form-label" style="color:white;">Game Link (Add the full link, include https...)</label>
+                    <InputText id="gamelink" @bind-Value="Games.GameLink" class="form-control" />
+                    <ValidationMessage For="() => Games.GameLink" class="text-danger" />
+                </div>
+                <div class="mb-3" hidden>
+                    <label for="gameid" class="form-label">Game ID</label>
+                    <InputNumber id="gameid" @bind-Value="Games.GameID" class="form-control" />
+                    <ValidationMessage For="() => Games.GameID" class="text-danger" />
+                </div>
+
+                <div style="display:flex; gap: 12px; justify-content:flex-end; margin-top: 14px;">
+                    <a href="/" class="btn btn-secondary" style="padding: 10px 18px; font-weight:600;">
+                        Back
+                    </a>
+
+                    <button type="submit" class="btn btn-primary" style="padding: 10px 22px; font-weight:600;">
+                        Create
+                    </button>
+                </div>
+            </div>
+
+            <!-- RIGHT: Image Upload Card -->
+            <div style="
+                background:#111;
+                border-radius: 18px;
+                padding: 22px;
+                box-shadow: 0 8px 30px rgba(0,0,0,0.35);
+                ">
+                <h4 style="color:white; margin:0 0 12px 0;">Game Thumbnail</h4>
+                <p style="color:#cfcfcf; margin: 0 0 14px 0; font-size: 14px;">
+                    Use images of size: (492×328). Max 5MB.
+                </p>
+
+                <label for="image" class="form-label" style="color:white;">Upload Image</label>
+                <InputFile id="image" OnChange="@LoadIMG" class="form-control" />
+
+                @if (Errors.Any())
+                {
+                    <div class="alert alert-danger mt-3 mb-0" role="alert">
+                        <b>Errors in Uploading Image:</b>
+                        <ul style="margin: 8px 0 0 0;">
+                            @foreach (var err in Errors)
+                            {
+                                <li>@err</li>
+                            }
+                        </ul>
+                    </div>
+                }
+
+                @if (Games.Thumbnail.Any())
+                {
+                    <div style="
+                        margin-top: 16px;
+                        border-radius: 16px;
+                        overflow:hidden;
+                        border: 1px solid rgba(255,255,255,0.12);
+                        background:#000;
+                        ">
+                        <img src="@Games.Thumbnail.FirstOrDefault()"
+                             style="width:100%; height: 280px; object-fit: cover;"
+                             alt="Uploaded Lesson Thumbnail" />
+                    </div>
+                }
+                else
+                {
+                    <div style="
+                        margin-top: 16px;
+                        height: 280px;
+                        border-radius: 16px;
+                        border: 1px dashed rgba(255,255,255,0.25);
+                        display:flex;
+                        align-items:center;
+                        justify-content:center;
+                        color:#aaa;
+                        text-align:center;
+                        padding: 14px;
+                        ">
+                        No image uploaded yet.
+                    </div>
+                }
+            </div>
+
+        </div>
+    </EditForm>
+</div>
+
+<script>
+    function showAlert() {
+        alert("Lesson added successfully");
+    }
+    function showPic() {
+        alert("Thumbnail uploaded successfully");
+    }
+    function noIMG() {
+        alert("Image uploaded is not allowed pick another");
+    }
+</script>
+@code {
+    private List<string> Errors = new List<string>();
+    private MP.Components.Models.Games Games { get; set; } = new();
+    private const int maxIMGFileSize = 5000000;
+    private MPcontext context = default!;
+    private async Task AddGame() //adds lesson to database if no error like img uploaded
+    {
+        if (Errors.Any())
+        {
+            await JS.InvokeVoidAsync("noIMG");
+        }
+        else
+        {
+            using var context = DbFactory.CreateDbContext();
+            context.Games.Add(Games);
+            await context.SaveChangesAsync();
+            await JS.InvokeVoidAsync("showAlert");
+
+        }
+
+    }
+    private async Task LoadIMG(InputFileChangeEventArgs f) //loads image uploaded and display warning if uploaded file is not suitable
+    {
+        Errors.Clear();
+        var files = f.GetMultipleFiles();
+        var IMG = files.FirstOrDefault();
+        if (IMG.Size > maxIMGFileSize)
+        {
+            Errors.Add($"File {IMG.Name} exceeds the maximum size of {maxIMGFileSize} bytes.");
+            StateHasChanged();
+        }
+
+        if (!IMG.ContentType.StartsWith("image/"))
+        {
+            Errors.Add($"File {IMG.Name} is not a supported image format.");
+            StateHasChanged();
+        }
+        using var stream = IMG.OpenReadStream(maxIMGFileSize);
+
+        using var imaging = await Image.LoadAsync<Rgba32>(stream);
+        imaging.Mutate(x => x.Resize(492, 328));
+        using (var mms = new MemoryStream())
+        {
+            await imaging.SaveAsJpegAsync(mms);
+            var fileBytes = mms.ToArray();
+
+            String base64String = Convert.ToBase64String(fileBytes);
+            string image = $"data:imaging/jpeg;base64,{base64String}";
+            if (Games.Thumbnail.Count() > 0)
+            {
+                Games.Thumbnail.Clear();
+            }
+            Games.Thumbnail.Add(image);
+            await JS.InvokeVoidAsync("showPic");
+        
+
+        }
+        StateHasChanged();
+    }
+}

@@ -1,0 +1,74 @@
+﻿@page "/lessons"
+@attribute [StreamRendering]
+@using MP.Components.Data
+@using MP.Components.Models
+@using Microsoft.EntityFrameworkCore
+@inject IDbContextFactory<MP.Components.Data.MPcontext> DbFactory
+@inject NavigationManager NavigationManager
+@rendermode InteractiveServer
+@implements IAsyncDisposable
+<PageTitle>Lessons</PageTitle>
+
+<h1>Lessons</h1>
+
+<p>Learn something new with these lessons!</p>
+<div style="
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 18px;
+    align-items: stretch;
+    ">
+    @foreach (var lesson in AllLessons)
+    {
+        <div style="
+            background:#111;
+            border-radius: 18px;
+            padding: 16px;
+            box-shadow: 0 8px 30px rgba(0,0,0,0.35);
+            color:white;
+            display:flex;
+            flex-direction:column;
+            gap: 10px;
+            ">
+            <div style="display:grid; gap: 6px; font-size: 15px;">
+                <div><b style="color:#cfcfcf;">Lesson Name: </b> @lesson.LessonName</div>
+            </div>
+            <div style="display:grid; gap: 6px; font-size: 15px;">
+                <div><b style="color:#cfcfcf;">Lesson ID: </b> @lesson.LessonID</div>
+            </div>
+            <div style="
+                border-radius: 16px;
+                overflow:hidden;
+                border: 1px solid rgba(255,255,255,0.12);
+                background:#000;
+                ">
+                <a href="@lesson.LessonLink" target="_blank">
+                    <img src="@lesson.Thumbnail.FirstOrDefault()"
+                         style="width:100%; height:auto; display:block;"
+                         alt="Lesson Thumbnail" />
+                </a>
+            </div>
+
+            
+
+            @* <div style="display:flex; gap:10px; flex-wrap:wrap; margin-top:auto;">
+                <a href="/foods/edit/@fooditem.FoodID" class="btn btn-primary" style="padding: 10px 14px; font-weight:600;">
+                    Edit
+                </a>
+                <a href="/foods/delete/@fooditem.FoodID" class="btn btn-danger" style="padding: 10px 14px; font-weight:600;">
+                    Delete
+                </a>
+            </div> *@
+        </div>
+    }
+</div>
+@code{
+    
+    private MPcontext context = default!;
+    private List<MP.Components.Models.Lessons> AllLessons = new();
+    protected override async Task OnInitializedAsync(){
+        context = DbFactory.CreateDbContext();
+        AllLessons = await context.Lessons.ToListAsync();
+    }
+    public async ValueTask DisposeAsync() => await context.DisposeAsync();
+}

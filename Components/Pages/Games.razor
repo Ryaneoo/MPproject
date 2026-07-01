@@ -1,0 +1,75 @@
+﻿@page "/games"
+@attribute [StreamRendering]
+@using MP.Components.Data
+@using MP.Components.Models
+@using Microsoft.EntityFrameworkCore
+@inject IDbContextFactory<MP.Components.Data.MPcontext> DbFactory
+@inject NavigationManager NavigationManager
+@rendermode InteractiveServer
+@implements IAsyncDisposable
+<PageTitle>Games</PageTitle>
+
+<h1>Games</h1>
+
+<p>Have some fun learning with games!</p>
+<div style="
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 18px;
+    align-items: stretch;
+    ">
+    @foreach (var game in AllGames)
+    {
+        <div style="
+            background:#111;
+            border-radius: 18px;
+            padding: 16px;
+            box-shadow: 0 8px 30px rgba(0,0,0,0.35);
+            color:white;
+            display:flex;
+            flex-direction:column;
+            gap: 10px;
+            ">
+            <div style="display:grid; gap: 6px; font-size: 15px;">
+                <div><b style="color:#cfcfcf;">Game Name: </b> @game.GameName</div>
+            </div>
+            <div style="display:grid; gap: 6px; font-size: 15px;">
+                <div><b style="color:#cfcfcf;">Game ID: </b> @game.GameID</div>
+            </div>
+            <div style="
+                border-radius: 16px;
+                overflow:hidden;
+                border: 1px solid rgba(255,255,255,0.12);
+                background:#000;
+                ">
+                <a href="@game.GameLink" target="_blank">
+                    <img src="@game.Thumbnail.FirstOrDefault()"
+                         style="width:100%; height:auto; display:block;"
+                         alt="Game Thumbnail" />
+                </a>
+            </div>
+
+            
+
+            @* <div style="display:flex; gap:10px; flex-wrap:wrap; margin-top:auto;">
+                <a href="/foods/edit/@fooditem.FoodID" class="btn btn-primary" style="padding: 10px 14px; font-weight:600;">
+                    Edit
+                </a>
+                <a href="/foods/delete/@fooditem.FoodID" class="btn btn-danger" style="padding: 10px 14px; font-weight:600;">
+                    Delete
+                </a>
+            </div> *@
+        </div>
+    }
+</div>
+@code {
+
+    private MPcontext context = default!;
+    private List<MP.Components.Models.Games> AllGames = new();
+    protected override async Task OnInitializedAsync()
+    {
+        context = DbFactory.CreateDbContext();
+        AllGames = await context.Games.ToListAsync();
+    }
+    public async ValueTask DisposeAsync() => await context.DisposeAsync();
+}
