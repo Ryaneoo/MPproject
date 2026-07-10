@@ -5,7 +5,7 @@
 namespace MP.Migrations
 {
     /// <inheritdoc />
-    public partial class seed : Migration
+    public partial class Azure : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)

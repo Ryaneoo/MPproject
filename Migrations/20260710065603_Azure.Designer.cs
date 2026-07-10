@@ -11,8 +11,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace MP.Migrations
 {
     [DbContext(typeof(MPcontext))]
-    [Migration("20260701063423_seed")]
-    partial class seed
+    [Migration("20260710065603_Azure")]
+    partial class Azure
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
