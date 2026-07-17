@@ -1,0 +1,61 @@
+﻿@page "/leaderboard"
+
+@using MP.Components.Models
+@inject FirebaseLeaderboardService leaderboardService
+@using MP.Components.Data
+@using Microsoft.EntityFrameworkCore
+@inject IDbContextFactory<MP.Components.Data.MPcontext> DbFactory
+@inject NavigationManager NavigationManager
+@rendermode InteractiveServer
+@implements IAsyncDisposable
+
+<h1>Leaderboards</h1>
+
+
+@foreach (var board in Allboards)
+{
+    <h2>@board.LeaderboardName</h2>
+
+    <table>
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Score</th>
+            </tr>
+        </thead>
+
+        <tbody>
+
+            @foreach (var player in board.Scores)
+            {
+                <tr>
+                    <td>@player.DisplayName</td>
+                    <td>@player.score</td>
+                </tr>
+            }
+
+        </tbody>
+
+    </table>
+}
+
+
+
+@code {
+    private MPcontext context = default!;
+    private List<MP.Components.Models.LeaderboardConfig> Allboards = new();
+    private List<MP.Components.Models.LeaderboardEntry> leaderboardscores = new();
+    protected override async Task OnInitializedAsync()
+    {
+        context = DbFactory.CreateDbContext();
+        Allboards = await context.Boards.ToListAsync();
+        foreach (var board in Allboards)
+        {
+            if (!string.IsNullOrEmpty(board.FirebaseUrl))
+            {
+                board.Scores = await leaderboardService.GetLeaderboard(board.FirebaseUrl);
+            }
+        }
+    }
+    public async ValueTask DisposeAsync() => await context.DisposeAsync();
+}

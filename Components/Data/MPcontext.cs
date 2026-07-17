@@ -12,9 +12,11 @@ public class MPcontext : DbContext
 
     public DbSet<Games> Games { get; set; } = default!;
     public DbSet<Lessons> Lessons   { get; set; } = default!;
+    public DbSet<LeaderboardConfig> Boards { get; set; } = default!;
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.ApplyConfiguration(new LessonsSeeding());
         modelBuilder.ApplyConfiguration(new GamesSeeding());
+        modelBuilder.ApplyConfiguration(new LeaderboardSeeding());
     }
 }
