@@ -1,4 +1,12 @@
+@font-face {
+    font-family: 'Bauhaus 93';
+    src: url('fonts/Bauhaus 93 Regular.ttf') format('truetype');
+}
 
+@font-face {
+    font-family: 'Calisto MT';
+    src: url('fonts/Calisto MT Regular.ttf') format('truetype');
+}
 
 html, body {
     margin: 0;
