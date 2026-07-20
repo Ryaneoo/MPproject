@@ -7,58 +7,178 @@
 @inject NavigationManager NavigationManager
 @rendermode InteractiveServer
 @implements IAsyncDisposable
-<PageTitle>Games</PageTitle>
 
-<h1>Games</h1>
+<PageTitle>Games | Calculo</PageTitle>
 
-<p>Have some fun learning with games!</p>
-<div style="
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-    gap: 18px;
-    align-items: stretch;
-    ">
-    @foreach (var game in AllGames)
-    {
-        <div style="
-            background:#111;
-            border-radius: 18px;
-            padding: 16px;
-            box-shadow: 0 8px 30px rgba(0,0,0,0.35);
-            color:white;
-            display:flex;
-            flex-direction:column;
-            gap: 10px;
-            ">
-            <div style="display:grid; gap: 6px; font-size: 15px;">
-                <div><b style="color:#cfcfcf;">Game Name: </b> @game.GameName</div>
-            </div>
-            <div style="display:grid; gap: 6px; font-size: 15px;">
-                <div><b style="color:#cfcfcf;">Game ID: </b> @game.GameID</div>
-            </div>
-            <div style="
-                border-radius: 16px;
-                overflow:hidden;
-                border: 1px solid rgba(255,255,255,0.12);
-                background:#000;
-                ">
-                <a href="@game.GameLink" target="_blank">
-                    <img src="@game.Thumbnail.FirstOrDefault()"
-                         style="width:100%; height:auto; display:block;"
-                         alt="Game Thumbnail" />
-                </a>
-            </div>
-        </div>
+<style>
+    .lessons-container, .games-container {
+        padding: 120px 40px 40px 40px; /* Explicitly offsets the 80px navigation menu bar height */
+        min-height: 100vh;
+        background-color: #121212;
+        color: white;
+        font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
     }
-</div>
-@code {
 
+    .lessons-header, .games-header {
+        margin-bottom: 40px;
+        text-align: left;
+    }
+
+    .lessons-title, .games-title {
+        font-family: 'Bauhaus 93', sans-serif;
+        font-size: 64px;
+        margin: 0 0 10px 0;
+        color: white;
+        text-shadow: 2px 2px 8px rgba(0,0,0,0.5);
+    }
+
+    .lessons-subtitle, .games-subtitle {
+        font-family: 'Calisto MT', serif;
+        font-size: 24px;
+        color: #b0b0b0;
+        margin: 0;
+    }
+
+    .lessons-grid, .games-grid {
+        display: grid;
+        /* Increased minmax width from 280px to 360px to make each box bigger */
+        grid-template-columns: repeat(auto-fill, minmax(360px, 1fr));
+        gap: 32px;
+        align-items: stretch;
+    }
+
+    .lesson-card, .game-card {
+        background: #1e1e1e;
+        border-radius: 20px; /* Slightly larger radius for the bigger card scale */
+        overflow: hidden;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.45);
+        display: flex;
+        flex-direction: column;
+        transition: transform 0.25s ease, box-shadow 0.25s ease;
+        border: 1px solid rgba(255, 255, 255, 0.05);
+    }
+
+        .lesson-card:hover, .game-card:hover {
+            transform: translateY(-6px);
+            box-shadow: 0 16px 36px rgba(110, 174, 85, 0.25);
+            border-color: rgba(110, 174, 85, 0.35);
+        }
+
+    .thumbnail-wrapper {
+        width: 100%;
+        aspect-ratio: 16 / 9;
+        overflow: hidden;
+        background: #000;
+        border-bottom: 1px solid rgba(255,255,255,0.08);
+    }
+
+    .lesson-thumbnail, .game-thumbnail {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        display: block;
+        transition: transform 0.3s ease;
+    }
+
+    .lesson-card:hover .lesson-thumbnail, .game-card:hover .game-thumbnail {
+        transform: scale(1.04);
+    }
+
+    .lesson-info, .game-info {
+        padding: 28px; /* Increased internal padding for breathing room */
+        display: flex;
+        flex-direction: column;
+        flex-grow: 1;
+        gap: 16px;
+    }
+
+    .lesson-id, .game-id {
+        font-size: 14px;
+        font-weight: bold;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        color: #6FAE55;
+        margin: 0;
+    }
+
+    .lesson-name, .game-name {
+        font-size: 24px; /* Increased text size to match larger card dimensions */
+        font-weight: bold;
+        color: white;
+        margin: 0;
+        line-height: 1.3;
+        flex-grow: 1;
+    }
+
+    .view-lesson-link, .play-game-link {
+        display: inline-block;
+        margin-top: 12px;
+        text-align: center;
+        padding: 14px 0; /* Taller touch target / button presence */
+        background-color: #333;
+        color: white;
+        text-decoration: none;
+        border-radius: 10px;
+        font-weight: bold;
+        font-size: 16px;
+        transition: background-color 0.2s ease;
+    }
+
+        .view-lesson-link:hover, .play-game-link:hover {
+            background-color: #6FAE55;
+            color: white;
+            text-decoration: none;
+        }
+</style>
+<div class="games-container">
+    <div class="games-header">
+        <h1 class="games-title">Games</h1>
+        <p class="games-subtitle">Have some fun learning with games!</p>
+    </div>
+
+    <div class="games-grid">
+        @if (AllGames != null)
+        {
+            @foreach (var game in AllGames)
+            {
+                <div class="game-card">
+                    <div class="thumbnail-wrapper">
+                        <a href="@game.GameLink" target="_blank">
+                            <img src="@(game.Thumbnail?.FirstOrDefault() ?? "Images/placeholder.png")"
+                                 class="game-thumbnail"
+                                 alt="@game.GameName Thumbnail" />
+                        </a>
+                    </div>
+
+                    <div class="game-info">
+                        <p class="game-id">ID: @game.GameID</p>
+                        <h2 class="game-name">@game.GameName</h2>
+
+                        <a href="@game.GameLink" target="_blank" class="play-game-link">
+                            Launch Game 🎮
+                        </a>
+                    </div>
+                </div>
+            }
+        }
+    </div>
+</div>
+
+@code {
     private MPcontext context = default!;
     private List<MP.Components.Models.Games> AllGames = new();
+
     protected override async Task OnInitializedAsync()
     {
         context = DbFactory.CreateDbContext();
         AllGames = await context.Games.ToListAsync();
     }
-    public async ValueTask DisposeAsync() => await context.DisposeAsync();
+
+    public async ValueTask DisposeAsync()
+    {
+        if (context != null)
+        {
+            await context.DisposeAsync();
+        }
+    }
 }

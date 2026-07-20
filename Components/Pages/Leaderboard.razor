@@ -1,5 +1,4 @@
 ﻿@page "/leaderboard"
-
 @using MP.Components.Models
 @inject FirebaseLeaderboardService leaderboardService
 @using MP.Components.Data
@@ -9,42 +8,181 @@
 @rendermode InteractiveServer
 @implements IAsyncDisposable
 
-<h1>Leaderboards</h1>
+<PageTitle>Leaderboards | Calculo</PageTitle>
 
+<style>
+    .leaderboard-container {
+        padding: 120px 40px 40px 40px; /* Pushes content down past the 80px absolute navbar */
+        min-height: 100vh;
+        background-color: #121212;
+        color: white;
+        font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    }
 
-@foreach (var board in Allboards)
-{
-    <h2>@board.LeaderboardName</h2>
+    .page-title {
+        text-align: center;
+        color: white;
+        font-size: 60px;
+        font-family: 'Bauhaus 93', sans-serif;
+        margin: 0 0 10px 0;
+        text-shadow: 2px 2px 8px rgba(0,0,0,0.5);
+    }
 
-    <table>
-        <thead>
-            <tr>
-                <th>Name</th>
-                <th>Score</th>
-            </tr>
-        </thead>
+    .subtitle {
+        text-align: center;
+        color: #b0b0b0;
+        margin-bottom: 40px;
+        font-size: 22px;
+        font-family: 'Calisto MT', serif;
+    }
 
-        <tbody>
+    .board-container {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 32px;
+    }
 
-            @foreach (var player in board.Scores)
-            {
-                <tr>
-                    <td>@player.DisplayName</td>
-                    <td>@player.score</td>
-                </tr>
+    .board-card {
+        width: 400px;
+        background: #1e1e1e;
+        border-radius: 20px;
+        padding: 28px;
+        box-shadow: 0 10px 30px rgba(0,0,0,.45);
+        border: 1px solid rgba(255, 255, 255, 0.05);
+    }
+
+    .board-title {
+        text-align: center;
+        color: #6FAE55; /* Uses the signature Calculo green accent color */
+        font-size: 26px;
+        margin-bottom: 24px;
+        font-family: 'Bauhaus 93', sans-serif;
+    }
+
+    .score-table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+
+        .score-table th {
+            background: #2a2a2a;
+            color: #cfcfcf;
+            padding: 14px;
+            font-weight: bold;
+            text-transform: uppercase;
+            font-size: 13px;
+            letter-spacing: 0.5px;
+        }
+
+            .score-table th:first-child {
+                border-top-left-radius: 8px;
+                border-bottom-left-radius: 8px;
             }
 
-        </tbody>
+            .score-table th:last-child {
+                border-top-right-radius: 8px;
+                border-bottom-right-radius: 8px;
+            }
 
-    </table>
-}
+        .score-table td {
+            padding: 14px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            font-size: 16px;
+        }
 
+        .score-table tr:last-child td {
+            border-bottom: none;
+        }
 
+        .score-table tr:hover {
+            background: rgba(255, 255, 255, 0.03);
+        }
+
+    .rank {
+        width: 60px;
+        text-align: center;
+        font-size: 20px;
+    }
+
+    .score {
+        text-align: right;
+        font-weight: bold;
+        color: #6FAE55;
+    }
+</style>
+
+<div class="leaderboard-container">
+    <h1 class="page-title">🏆 Leaderboards</h1>
+    <p class="subtitle">See the highest scores from every game!</p>
+
+    <div class="board-container">
+        @if (Allboards != null)
+        {
+            @foreach (var board in Allboards)
+            {
+                <div class="board-card">
+                    <div class="board-title">
+                        @board.LeaderboardName
+                    </div>
+
+                    <table class="score-table">
+                        <thead>
+                            <tr>
+                                <th class="rank">Rank</th>
+                                <th style="text-align: left;">Name</th>
+                                <th style="text-align: right;">Score</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @{
+                                int rank = 1;
+                            }
+                            @if (board.Scores != null)
+                            {
+                                @foreach (var player in board.Scores)
+                                {
+                                    <tr>
+                                        <td class="rank">
+                                            @if (rank == 1)
+                                            {
+                                                <span>🥇</span>
+                                            }
+                                            else if (rank == 2)
+                                            {
+
+                                                <span>🥈</span>
+                                            }
+                                            else if (rank == 3)
+                                            {
+
+                                                <span>🥉</span>
+                                            }
+                                            else
+                                            {
+
+                                                <span>@rank</span>
+                                            }
+                                        </td>
+                                        <td style="color: white;">@player.DisplayName</td>
+                                        <td class="score">@player.score</td>
+                                    </tr>
+                                    rank++;
+                                }
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            }
+        }
+    </div>
+</div>
 
 @code {
     private MPcontext context = default!;
     private List<MP.Components.Models.LeaderboardConfig> Allboards = new();
     private List<MP.Components.Models.LeaderboardEntry> leaderboardscores = new();
+
     protected override async Task OnInitializedAsync()
     {
         context = DbFactory.CreateDbContext();
@@ -57,5 +195,12 @@
             }
         }
     }
-    public async ValueTask DisposeAsync() => await context.DisposeAsync();
+
+    public async ValueTask DisposeAsync()
+    {
+        if (context != null)
+        {
+            await context.DisposeAsync();
+        }
+    }
 }

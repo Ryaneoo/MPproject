@@ -1,34 +1,32 @@
-﻿﻿
-@inject NavigationManager NavigationManager
+﻿@inject NavigationManager NavigationManager
 <nav style="
     background-color: lightslategray;
     display: flex;
     justify-content: normal;
     width: 100%;
-    position: fixed;
+    position: absolute;
     top: 0;
-    gap:20px;
-
+    gap: 20px;
     z-index: 1000;
-    height: 5%;
+    height: 80px; /* Fixed height instead of 9% */
     ">
-        <div>
-            <a style="font-size:32px; color:black;" href="/"> Calculo </a>
-            
-        </div>
-        
-   
-   
-        <div>
-        <a style="font-size:28px;" href="/lessons"> Lessons </a>
-        </div>
-
     <div>
-        <a style="font-size:28px;" href="/games"> Games </a>
+        <a href="/">
+            <img src="Images/calculo-logo.png"
+                 alt="Calculo Logo"
+                 class="nav-logo" style="height: 80px; width: auto;" />
+        </a>
     </div>
 
-    <div>
-        <a style="font-size:28px;" href="/leaderboard"> Leaderboards </a>
+    <div style="display: flex; align-items: center;">
+        <a style="font-size: 35px; margin-right: 15px; color: white; text-decoration: none;" href="/lessons"> Lessons </a>
+    </div>
+
+    <div style="display: flex; align-items: center;">
+        <a style="font-size: 35px; margin-right: 15px; color: white; text-decoration: none;" href="/games"> Games </a>
+    </div>
+
+    <div style="display: flex; align-items: center;">
+        <a style="font-size: 35px; color: white; text-decoration: none;" href="/leaderboard"> Leaderboards </a>
     </div>
 </nav>
-
