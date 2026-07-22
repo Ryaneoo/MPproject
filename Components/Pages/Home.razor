@@ -1,11 +1,21 @@
 ﻿@page "/"
-
 <PageTitle>Home</PageTitle>
 
 <style>
+    /* Prevent default margins from causing unexpected white space */
+    html, body {
+        margin: 0;
+        padding: 0;
+        background-color: #121212; /* Dark background fallback */
+    }
+
     .hero {
         width: 100%;
-        flex: 1; /* Replaces min-height calculation */
+        /* Replaced flex: 1 with explicit viewport height minus navbar height */
+        min-height: calc(100vh);
+        box-sizing: border-box;
+        padding: 60px 20px 40px; /* Added top padding to keep the large title safely below your navbar */
+
         display: flex;
         flex-direction: column;
         justify-content: center;
@@ -20,8 +30,9 @@
     .hero-title {
         color: white;
         font-family: 'Bauhaus 93';
-        font-size: 110px;
+        font-size: 110px; /* Unchanged */
         margin: 0;
+        line-height: 1; /* Added to keep title bounds tightly aligned and prevent top clipping */
         text-shadow: 3px 3px 10px rgba(0,0,0,0.6);
     }
 
@@ -30,7 +41,7 @@
         font-family: 'Calisto MT';
         font-size: 40px;
         font-weight: normal;
-        margin-top: 20px; /* Keeps spacing below the title */
+        margin-top: 20px;
         margin-bottom: 10px;
     }
 
@@ -38,7 +49,7 @@
         color: white;
         font-family: 'Calisto MT';
         font-size: 22px;
-        margin-top: 0; /* ADD THIS: Prevents top margin collapse */
+        margin-top: 0;
         margin-bottom: 40px;
     }
 
@@ -96,5 +107,4 @@
         </a>
 
     </div>
-
 </div>
