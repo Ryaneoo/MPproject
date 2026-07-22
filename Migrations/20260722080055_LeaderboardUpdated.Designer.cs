@@ -11,8 +11,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace MP.Migrations
 {
     [DbContext(typeof(MPcontext))]
-    [Migration("20260717090808_leaderboard")]
-    partial class leaderboard
+    [Migration("20260722080055_LeaderboardUpdated")]
+    partial class LeaderboardUpdated
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -92,8 +92,26 @@ namespace MP.Migrations
                         new
                         {
                             LeaderboardID = 3,
-                            FirebaseUrl = "https://skipcounting-a54ba-default-rtdb.asia-southeast1.firebasedatabase.app/",
-                            LeaderboardName = "Skip Counting Leaderboard"
+                            FirebaseUrl = "https://skipcounting-a54ba-default-rtdb.asia-southeast1.firebasedatabase.app/leaderboard_2s.json",
+                            LeaderboardName = "Skip Counting - 2s"
+                        },
+                        new
+                        {
+                            LeaderboardID = 4,
+                            FirebaseUrl = "https://skipcounting-a54ba-default-rtdb.asia-southeast1.firebasedatabase.app/leaderboard_5s.json",
+                            LeaderboardName = "Skip Counting - 5s"
+                        },
+                        new
+                        {
+                            LeaderboardID = 5,
+                            FirebaseUrl = "https://skipcounting-a54ba-default-rtdb.asia-southeast1.firebasedatabase.app/leaderboard_10s.json",
+                            LeaderboardName = "Skip Counting - 10s"
+                        },
+                        new
+                        {
+                            LeaderboardID = 6,
+                            FirebaseUrl = "https://skipcounting-a54ba-default-rtdb.asia-southeast1.firebasedatabase.app/leaderboard_random.json",
+                            LeaderboardName = "Skip Counting - Everything"
                         });
                 });
 

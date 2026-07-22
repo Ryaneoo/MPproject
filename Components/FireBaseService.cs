@@ -1,4 +1,10 @@
-﻿using System.Net.Http.Json;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Net.Http;
+using System.Net.Http.Json;
+using System.Text.Json;
+using System.Threading.Tasks;
 using MP.Components.Models;
 
 public class FirebaseLeaderboardService
@@ -10,44 +16,74 @@ public class FirebaseLeaderboardService
         this.http = http;
     }
 
-
     public async Task<List<LeaderboardEntry>> GetLeaderboard(string firebaseURL)
     {
-        var json = await http.GetStringAsync(firebaseURL + "leaderboard.json");
-
-        if (string.IsNullOrWhiteSpace(json) || json == "null")
+        if (string.IsNullOrWhiteSpace(firebaseURL))
         {
             return new List<LeaderboardEntry>();
         }
 
+        // 1. Clean URL and check if endpoint is already provided
+        string targetUrl = firebaseURL.Trim();
 
-        // Try dictionary format
-        if (json.StartsWith("{"))
+        if (!targetUrl.EndsWith(".json", StringComparison.OrdinalIgnoreCase))
         {
-            var dictionary = System.Text.Json.JsonSerializer.Deserialize
-                <Dictionary<string, LeaderboardEntry>>(json);
-
-            return dictionary?.Values
-                .OrderByDescending(x => x.score)
-                .Take(5)
-                .ToList()
-                ?? new List<LeaderboardEntry>();
+            targetUrl = targetUrl.TrimEnd('/') + "/leaderboard.json";
         }
 
-
-        // Try array format
-        if (json.StartsWith("["))
+        try
         {
-            var list = System.Text.Json.JsonSerializer.Deserialize
-                <List<LeaderboardEntry>>(json);
+            // 2. Fetch raw JSON string from Firebase
+            var json = await http.GetStringAsync(targetUrl);
 
-            return list?
-                .OrderByDescending(x => x.score)
-                .Take(5)
-                .ToList()
-                ?? new List<LeaderboardEntry>();
+            if (string.IsNullOrWhiteSpace(json) || json == "null")
+            {
+                return new List<LeaderboardEntry>();
+            }
+
+            json = json.Trim();
+
+            var options = new JsonSerializerOptions
+            {
+                PropertyNameCaseInsensitive = true
+            };
+
+            // 3. Try dictionary/object format: { "-N123": { "name": "AAA", "score": 100 } }
+            if (json.StartsWith("{"))
+            {
+                var dictionary = JsonSerializer.Deserialize<Dictionary<string, LeaderboardEntry>>(json, options);
+
+                return dictionary?.Values
+                    .Where(x => x != null)
+                    .OrderByDescending(x => x.score)
+                    .Take(5)
+                    .ToList()
+                    ?? new List<LeaderboardEntry>();
+            }
+
+            // 4. Try array/list format: [ { "name": "AAA", "score": 100 }, ... ]
+            if (json.StartsWith("["))
+            {
+                var list = JsonSerializer.Deserialize<List<LeaderboardEntry>>(json, options);
+
+                return list?
+                    .Where(x => x != null)
+                    .OrderByDescending(x => x.score)
+                    .Take(5)
+                    .ToList()
+                    ?? new List<LeaderboardEntry>();
+            }
         }
-
+        catch (HttpRequestException ex)
+        {
+            Console.WriteLine($"Firebase Request Error: {ex.Message}");
+            return new List<LeaderboardEntry>();
+        }
+        catch (JsonException ex)
+        {
+            Console.WriteLine($"JSON Parsing Error: {ex.Message}");
+            return new List<LeaderboardEntry>();
+        }
 
         return new List<LeaderboardEntry>();
     }
