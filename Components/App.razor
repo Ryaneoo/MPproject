@@ -1,21 +1,18 @@
 ﻿<!DOCTYPE html>
-<html lang="en">
-
+<html lang="en" style="height: 100%; overflow: auto;">
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <base href="/" />
     <link rel="stylesheet" href="bootstrap/bootstrap.min.css" />
-    <!-- Added ?v=1.0.1 to break the cloud cache -->
-    <link rel="stylesheet" href="app.css?v=1.0.1" />
-    <link rel="stylesheet" href="MP.styles.css?v=1.0.1" />
+    <!-- Added ?v=1.0.2 to break cache -->
+    <link rel="stylesheet" href="app.css?v=1.0.2" />
+    <link rel="stylesheet" href="MP.styles.css?v=1.0.2" />
     <link rel="icon" type="image/png" href="favicon.png" />
     <HeadOutlet />
 </head>
-
-<body>
+<body style="min-height: 100vh; height: auto; overflow-y: auto !important; position: relative;">
     <Routes />
     <script src="_framework/blazor.web.js"></script>
 </body>
-
 </html>

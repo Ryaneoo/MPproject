@@ -12,11 +12,17 @@
 
 <style>
     .leaderboard-container {
-        padding: 120px 40px 40px 40px; /* Pushes content down past the 80px absolute navbar */
-        min-height: 100vh;
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        padding: 120px 40px 60px 40px;
+        overflow-y: auto !important;
         background-color: #121212;
         color: white;
         font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+        z-index: 10; /* Sits cleanly under navigation */
     }
 
     .page-title {
