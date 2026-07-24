@@ -12,7 +12,7 @@
     <h1 style="color:red">Warning: This page should only be accessed if you are an approved admin</h1>
     
     <div>
-        <hr / style="color:white;">
+        
         @if (game is null)
         {
             <h1 style="color:red; text-align:center;"><em>No game can be found.</em></h1>
@@ -60,11 +60,11 @@
 
 
     }
-    protected override void OnInitialized() //get lesson id
+    protected override void OnInitialized() //get game id
     {
         game = gamecontext.Games.FirstOrDefault(x => x.GameID == id);
     }
-    private async Task DeleteGame() //remove lesson from database
+    private async Task DeleteGame() //remove game from database
     {
         using var context = DbFactory.CreateDbContext();
         context.Games.Remove(game!);

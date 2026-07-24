@@ -52,6 +52,13 @@ namespace MP.Migrations
                             GameLink = "https://play.unity.com/en/games/bd29b7bb-5721-4838-b924-f3f413c7a5bd/mp",
                             GameName = "Math Space Race",
                             Thumbnail = "[\"/Images/GameThumbnail1.png\"]"
+                        },
+                        new
+                        {
+                            GameID = 2,
+                            GameLink = "https://play.unity.com/en/games/916d7430-f1a1-4bb7-924b-234c12bf7f95/count-the-animals",
+                            GameName = "Counting Animals",
+                            Thumbnail = "[\"/Images/GameThumbnail2.png\"]"
                         });
                 });
 

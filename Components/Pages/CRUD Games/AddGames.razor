@@ -133,6 +133,14 @@
         </div>
     </EditForm>
 </div>
+<script>
+    function showAlert() {
+        alert("Game added successfully");
+    }
+    function noIMG() {
+        alert("Image uploaded is not allowed pick another");
+    }
+</script>
 @code {
     private List<string> Errors = new List<string>();
     private MP.Components.Models.Games Games { get; set; } = new();
