@@ -1,4 +1,3 @@
-# MP
 # For those working on MP Project:
 # KEY LINKS TO TAKE NOTE THAT ARE MEANT FOR THOSE WORKING ON THIS:
 
